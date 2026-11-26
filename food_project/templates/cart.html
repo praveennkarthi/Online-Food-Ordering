@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Cart - Namma Oota{% endblock %}
+{% block content %}
+<h1>Your cart</h1>
+{% if cart.lines %}
+<p class="muted">From <a href="{% url 'restaurant_detail' cart.restaurant.pk %}">{{ cart.restaurant.name }}</a></p>
+<table>
+  <thead><tr><th>Item</th><th>Quantity</th><th class="num">Amount</th></tr></thead>
+  <tbody>
+  {% for line in cart.lines %}
+    <tr>
+      <td>{{ line.item.name }}<br><span class="muted">₹{{ line.item.price|floatformat:"-2" }} each</span></td>
+      <td>
+        <form method="post" action="{% url 'update_cart' line.item.pk %}">{% csrf_token %}
+          <input type="number" name="quantity" value="{{ line.quantity }}" min="0" max="20" aria-label="Quantity of {{ line.item.name }}">
+          <button class="btn plain small" type="submit">Update</button>
+        </form>
+      </td>
+      <td class="num">
+        ₹{{ line.subtotal|floatformat:"-2" }}
+        <form method="post" action="{% url 'remove_from_cart' line.item.pk %}" style="display:block">{% csrf_token %}
+          <button class="btn plain small" type="submit" style="margin-top:4px">Remove</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+  <tfoot><tr><td colspan="2">Total</td><td class="num">₹{{ cart.total|floatformat:"-2" }}</td></tr></tfoot>
+</table>
+<p style="margin-top:24px"><a class="btn" href="{% url 'checkout' %}">Go to checkout</a></p>
+{% else %}
+<p>Nothing in your cart yet.</p>
+<p><a href="{% url 'restaurant_list' %}">Pick a restaurant</a></p>
+{% endif %}
+{% endblock %}

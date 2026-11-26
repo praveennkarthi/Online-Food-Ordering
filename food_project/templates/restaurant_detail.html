@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ restaurant.name }} - Namma Oota{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{{ restaurant.name }}</h1>
+  <p>{{ restaurant.cuisine }}, {{ restaurant.address }}</p>
+  <p class="muted">{{ restaurant.description }} Delivery in about {{ restaurant.delivery_time }} minutes.</p>
+  {% if not restaurant.is_open %}<p class="closed-tag">Closed right now. You can look at the menu but not order.</p>{% endif %}
+</div>
+
+<h2>Menu</h2>
+<ul class="menu">
+  {% for item in items %}
+  <li class="dish">
+    <div class="dish-line">
+      <span class="mark {% if item.is_veg %}veg{% else %}nonveg{% endif %}" title="{% if item.is_veg %}Vegetarian{% else %}Non-vegetarian{% endif %}"></span>
+      <span class="dish-name">{{ item.name }}</span>
+      <span class="leader"></span>
+      <span class="price">₹{{ item.price|floatformat:"-2" }}</span>
+      {% if restaurant.is_open %}
+      <form method="post" action="{% url 'add_to_cart' item.pk %}">{% csrf_token %}
+        <button class="btn small" type="submit">Add</button>
+      </form>
+      {% endif %}
+    </div>
+    {% if item.description %}<p class="dish-desc">{{ item.description }}</p>{% endif %}
+  </li>
+  {% empty %}
+  <li><p class="muted">This restaurant hasn't added a menu yet.</p></li>
+  {% endfor %}
+</ul>
+
+{% if products %}
+<h2>Products</h2>
+<ul class="menu">
+  {% for product in products %}
+  <li class="dish">
+    <div class="dish-line">
+      <span class="mark {% if product.is_veg %}veg{% else %}nonveg{% endif %}" title="{% if product.is_veg %}Vegetarian{% else %}Non-vegetarian{% endif %}"></span>
+      <span class="dish-name">{{ product.name }}</span>
+      <span class="leader"></span>
+      <span class="price">₹{{ product.price|floatformat:"-2" }}</span>
+    </div>
+    {% if product.description %}<p class="dish-desc">{{ product.description }}</p>{% endif %}
+    {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}" width="160">{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

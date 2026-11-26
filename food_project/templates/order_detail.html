@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Order #{{ order.pk }} - Namma Oota{% endblock %}
+{% block head %}{% if order.is_active %}<meta http-equiv="refresh" content="20">{% endif %}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Order #{{ order.pk }}</h1>
+  <p>{{ order.restaurant.name }}</p>
+  <p class="muted">Placed {{ order.created_at|date:"j M Y, g:i A" }}</p>
+</div>
+
+{% if order.status == "CANCELLED" %}
+  <p class="notice error">This order was cancelled.</p>
+{% else %}
+  <ol class="progress">
+    {% for s in steps %}<li class="{% if s.done %}done{% endif %}{% if s.current %} now{% endif %}">{{ s.label }}</li>{% endfor %}
+  </ol>
+  {% if order.is_active %}<p class="muted">This page checks for updates every 20 seconds.</p>{% endif %}
+{% endif %}
+
+<h2>Items</h2>
+{% for i in order.items.all %}
+<div class="summary-line"><span>{{ i.quantity }} x {{ i.name }}</span><span>₹{{ i.subtotal|floatformat:"-2" }}</span></div>
+{% endfor %}
+<div class="summary-total"><span>Total</span><span>₹{{ order.total|floatformat:"-2" }}</span></div>
+
+<h2 style="margin-top:28px">Delivery</h2>
+<p>{{ order.address|linebreaksbr }}<br>{{ order.phone }}</p>
+
+{% if order.can_cancel %}
+<form method="post" action="{% url 'cancel_order' order.pk %}" onsubmit="return confirm('Cancel this order?')">
+  {% csrf_token %}<button class="btn danger" type="submit">Cancel order</button>
+</form>
+{% endif %}
+{% endblock %}

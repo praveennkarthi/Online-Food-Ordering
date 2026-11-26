@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Checkout - Namma Oota{% endblock %}
+{% block content %}
+<h1>Checkout</h1>
+<div class="split">
+  <section>
+    <h2>Where should we deliver?</h2>
+    <form method="post">{% csrf_token %}
+      {{ form.as_div }}
+      <button class="btn" type="submit">Place order</button>
+      <p class="muted">You pay in cash when the order arrives.</p>
+    </form>
+  </section>
+  <section>
+    <h2>{{ cart.restaurant.name }}</h2>
+    {% for line in cart.lines %}
+    <div class="summary-line"><span>{{ line.quantity }} x {{ line.item.name }}</span><span>₹{{ line.subtotal|floatformat:"-2" }}</span></div>
+    {% endfor %}
+    <div class="summary-total"><span>Total</span><span>₹{{ cart.total|floatformat:"-2" }}</span></div>
+  </section>
+</div>
+{% endblock %}

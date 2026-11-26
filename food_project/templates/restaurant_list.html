@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Restaurants - Namma Oota{% endblock %}
+{% block content %}
+
+<h2>Restaurants</h2>
+
+<form method="get">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search restaurant or dish">
+  <button type="submit">Search</button>
+</form>
+
+{% for restaurant in restaurants %}
+  <div class="card">
+    <h3>{{ restaurant.name }}</h3>
+    <p>{{ restaurant.cuisine }}, {{ restaurant.address }}</p>
+    <p class="muted">{{ restaurant.description }}</p>
+    <a href="{% url 'restaurant_detail' restaurant.pk %}">View Menu</a>
+  </div>
+{% empty %}
+  <p>No restaurants found.</p>
+{% endfor %}
+
+{% endblock %}
